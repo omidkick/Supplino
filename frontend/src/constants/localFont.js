@@ -3,7 +3,7 @@ import LocalFont from "next/font/local";
 const iranYekanFont = LocalFont({
   src: [
     {
-      path: "../../public/fonts/iranYekan/IRANYekanx-Thin.woff2",
+      path: "../../public/fonts/iranYekan/IRANYekanX-Thin.woff2",
       weight: "100",
       style: "normal",
     },

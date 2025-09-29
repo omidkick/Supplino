@@ -1,0 +1,5 @@
+{
+  "platform": "next",
+  "app": "supplino",
+  "port": 3000
+}

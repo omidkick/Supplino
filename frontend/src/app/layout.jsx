@@ -1,9 +1,9 @@
 import NextThemeProvider from "@/context/ThemeProvider";
-import iranYekanFont from "../constants/localFont";
 import "../styles/globals.css";
 import Providers from "./Providers";
 import { Toaster } from "react-hot-toast";
 import { StepProvider } from "@/context/StepContext";
+import iranYekanFont from "@/constants/localFont";
 
 export const metadata = {
   title: {

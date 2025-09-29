@@ -15,7 +15,13 @@ import { useGetUser } from "@/hooks/useAuth";
 import toast from "react-hot-toast";
 import AddToCart from "./AddToCart";
 
-const ProductCard = ({ product }) => {
+import { useProductActions } from "@/hooks/useProducts"; 
+
+const ProductCard = ({ product: serverProduct }) => {
+  const { product: clientProduct } = useProductActions(serverProduct?._id);
+  const product = clientProduct || serverProduct; 
+
+
   // Calculate discount percentage
   const discountPercentage = product.discount || 0;
   const hasDiscount = discountPercentage > 0;
@@ -122,7 +128,7 @@ const ProductCard = ({ product }) => {
                 onShare={handleShare}
                 className="flex-col !gap-2"
                 iconSize="w-5 h-5"
-                showCounts={false}
+                showCounts={true}
               />
             </div>
           </div>

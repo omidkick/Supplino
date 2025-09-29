@@ -34,8 +34,7 @@ async function HomePage() {
 
       <SupplementFAQSection />
 
-       <BackToTop />
-      
+      <BackToTop />
     </>
   );
 }

@@ -9,13 +9,13 @@ import SectionHeader from "@/ui/SectionHeader";
 // This component only handles the data fetching
 async function BestSellingProductsContent() {
   const data = await getAllProducts();
-  const { products } = data || {};
-
-  const bestSellingProducts =
-    products
-      ?.filter((product) => product.saleCount > 0)
+  
+  // No try-catch needed anymore - service handles it
+  const bestSellingProducts = 
+    data.products
+      .filter((product) => product?.saleCount > 0)
       .sort((a, b) => b.saleCount - a.saleCount)
-      .slice(0, 7) || [];
+      .slice(0, 7);
 
   return <BestSellingSlider products={bestSellingProducts} />;
 }

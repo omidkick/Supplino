@@ -77,7 +77,7 @@ function ProductInteraction({
   if (!product) return null;
 
   return (
-    <div className={`flex items-center gap-x-4 ${className}`}>
+    <div className={`flex items-start gap-x-4 ${className}`}>
       {/* Like Button */}
       <ButtonIcon
         variant="red"
@@ -166,11 +166,11 @@ function ProductInteraction({
               </motion.div>
             )}
           </AnimatePresence>
-          {showCounts && (
+          {/* {showCounts && (
             <span className="mr-1 font-bold">
               {toPersianDigits(product.bookmarksCount || 0)}
             </span>
-          )}
+          )} */}
         </ButtonIcon>
       )}
 

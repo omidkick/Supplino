@@ -1,0 +1,12 @@
+{
+  "disks": [
+    {
+      "name": "data",
+      "mountTo": "uploads"
+    }
+  ],
+
+  "platform": "node",
+  "app": "supplino-api",
+  "port": 5000
+}

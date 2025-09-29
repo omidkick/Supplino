@@ -27,33 +27,39 @@ class userAuthController extends Controller {
     this.code = 0;
     this.phoneNumber = null;
   }
-  async getOtp(req, res) {
-    let { phoneNumber } = req.body;
+// In user.controller.js - fix the IS_TESTING_MODE_OTP check
+async getOtp(req, res) {
+  let { phoneNumber } = req.body;
 
-    if (!phoneNumber)
-      throw createError.BadRequest("شماره موبایل معتبر را وارد کنید");
+  if (!phoneNumber)
+    throw createError.BadRequest("شماره موبایل معتبر را وارد کنید");
 
-    phoneNumber = phoneNumber.trim();
-    this.phoneNumber = phoneNumber;
-    this.code = generateRandomNumber(6);
+  phoneNumber = phoneNumber.trim();
+  this.phoneNumber = phoneNumber;
+  this.code = generateRandomNumber(6);
 
-    const result = await this.saveUser(phoneNumber);
-    if (!result) throw createError.Unauthorized("ورود شما انجام نشد.");
+  const result = await this.saveUser(phoneNumber);
+  if (!result) throw createError.Unauthorized("ورود شما انجام نشد.");
 
-    // send OTP
-    if (process.env.IS_TESTING_MODE_OTP) {
-      return res.status(HttpStatus.OK).send({
-        statusCode: HttpStatus.OK,
-        data: {
-          message: `کد تائید برای ورود تستی: ${this.code}`,
-          expiresIn: CODE_EXPIRES,
-          phoneNumber,
-        },
-      });
-    } else {
-      this.sendOTP(phoneNumber, res);
-    }
+  // Fix: Convert string to boolean for proper check
+  const isTestingMode = process.env.IS_TESTING_MODE_OTP === "true";
+  
+  // send OTP
+  if (isTestingMode) {
+    return res.status(HttpStatus.OK).send({
+      statusCode: HttpStatus.OK,
+      data: {
+        message: `کد تائید برای ورود تستی: ${this.code}`,
+        expiresIn: CODE_EXPIRES,
+        phoneNumber,
+      },
+    });
+  } else {
+    this.sendOTP(phoneNumber, res);
   }
+}
+
+
   async checkOtp(req, res) {
     await checkOtpSchema.validateAsync(req.body);
     const { otp: code, phoneNumber } = req.body;
@@ -109,6 +115,8 @@ class userAuthController extends Controller {
       },
     });
   }
+
+
   async saveUser(phoneNumber) {
     const otp = {
       code: this.code,
@@ -139,37 +147,55 @@ class userAuthController extends Controller {
     );
     return !!updatedResult.modifiedCount;
   }
-  sendOTP(phoneNumber, res) {
-    const kaveNegarApi = Kavenegar.KavenegarApi({
-      apikey: `${process.env.KAVENEGAR_API_KEY}`,
-    });
-    kaveNegarApi.VerifyLookup(
-      {
-        receptor: phoneNumber,
-        token: this.code,
-        template: "registerVerify",
-      },
-      (response, status) => {
-        console.log("kavenegar message status", status);
-        if (response && status === 200)
-          return res.status(HttpStatus.OK).send({
-            statusCode: HttpStatus.OK,
-            data: {
-              message: `کد تائید برای شماره موبایل ${toPersianDigits(
-                phoneNumber
-              )} ارسال گردید`,
-              expiresIn: CODE_EXPIRES,
-              phoneNumber,
-            },
-          });
 
-        return res.status(status).send({
-          statusCode: status,
-          message: "کد اعتبارسنجی ارسال نشد",
+
+sendOTP(phoneNumber, res) {
+  // Check if API key exists
+  if (!process.env.KAVENEGAR_API_KEY) {
+    console.error("KAVENEGAR_API_KEY is not configured");
+    return res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
+      statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      message: "سرویس ارسال پیامک پیکربندی نشده است",
+    });
+  }
+
+  const kaveNegarApi = Kavenegar.KavenegarApi({
+    apikey: process.env.KAVENEGAR_API_KEY,
+  });
+  
+  kaveNegarApi.VerifyLookup(
+    {
+      receptor: phoneNumber,
+      token: this.code,
+      template: "registerVerify",
+    },
+    (response, status) => {
+      console.log("kavenegar message status", status);
+      console.log("kavenegar response", response);
+      
+      if (response && status === 200) {
+        return res.status(HttpStatus.OK).send({
+          statusCode: HttpStatus.OK,
+          data: {
+            message: `کد تائید برای شماره موبایل ${toPersianDigits(
+              phoneNumber
+            )} ارسال گردید`,
+            expiresIn: CODE_EXPIRES,
+            phoneNumber,
+          },
         });
       }
-    );
-  }
+
+      // More detailed error handling
+      console.error("Kavenegar API Error:", { status, response });
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: "خطا در ارسال کد اعتبارسنجی",
+        details: response || "Unknown error",
+      });
+    }
+  );
+}
   async completeProfile(req, res) {
     await completeProfileSchema.validateAsync(req.body);
     const { user } = req;
