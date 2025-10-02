@@ -41,6 +41,9 @@ SUPPLINO is a modern **fullstack application** designed to provide a scalable an
 ## 🛠 How to Use
 
 # 1. Clone the repository
+
+---
+```bash
 git clone https://github.com/omidkick/Supplino.git
 cd Supplino
 
