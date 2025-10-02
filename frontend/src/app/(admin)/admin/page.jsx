@@ -10,10 +10,7 @@ import { useCategories } from "@/hooks/useCategories";
 import { usePaymentActions } from "@/hooks/usePayments";
 import SalesChart from "./_components/SalesChart";
 import ProductsDonutChart from "./_components/ProductsDonutChart";
-import {
-  UserGroupIcon,
-  SparklesIcon,
-} from "@heroicons/react/24/outline";
+import { UserGroupIcon, SparklesIcon } from "@heroicons/react/24/outline";
 import LatestProducts from "./_components/LatestProducts";
 import LatestTickets from "./_components/LatestTickets";
 import { HiTicket } from "react-icons/hi";
@@ -46,7 +43,7 @@ function AdminContent() {
   // Comments
   const { commentsCount } = useAllComments();
 
-  if (isLoading) return <Loading />;
+  if (isLoading) return <Loading message="در حال بارگزاری اطلاعات" />;
 
   return (
     <div>

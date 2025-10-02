@@ -1,27 +1,9 @@
-import { Suspense } from "react";
-import { getAllProducts } from "@/services/productService";
 import BestSellingSlider from "./BestSellingSlider";
-import Loader from "@/ui/Loader";
 import { MdChevronLeft } from "react-icons/md";
 import { RiShoppingCartFill } from "react-icons/ri";
 import SectionHeader from "@/ui/SectionHeader";
 
-// This component only handles the data fetching
-async function BestSellingProductsContent() {
-  const data = await getAllProducts();
-  
-  // No try-catch needed anymore - service handles it
-  const bestSellingProducts = 
-    data.products
-      .filter((product) => product?.saleCount > 0)
-      .sort((a, b) => b.saleCount - a.saleCount)
-      .slice(0, 7);
-
-  return <BestSellingSlider products={bestSellingProducts} />;
-}
-
-// The main component
-function BestSellingProducts() {
+function BestSellingProducts({ products }) {
   return (
     <div className="max-w-screen-xl mx-auto my-8 md:px-4">
       {/* Header */}
@@ -38,15 +20,7 @@ function BestSellingProducts() {
       </div>
 
       {/* Slider */}
-      <Suspense
-        fallback={
-          <div className="flex justify-center items-center h-64 bg-secondary-100 rounded-3xl lg:mx-12">
-            <Loader message="در حال بارگذاری پرفروش‌ترین محصولات..." />
-          </div>
-        }
-      >
-        <BestSellingProductsContent />
-      </Suspense>
+      <BestSellingSlider products={products} />
     </div>
   );
 }

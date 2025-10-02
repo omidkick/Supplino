@@ -281,7 +281,7 @@ function ProductDetailsPage() {
                     </span>
                   </div>
                   <div className="font-bold text-secondary-800 text-sm md:text-base">
-                    {toPersianNumbers(product.likes?.length || 0)} نفر
+                    {toPersianNumbers(product.likesCount || 0)} نفر
                   </div>
                 </motion.div>
               </div>
@@ -330,8 +330,6 @@ function ProductDetailsPage() {
                     ? "text-primary-600 border-b-2 border-primary-600 bg-primary-50/50"
                     : "text-secondary-400 hover:text-secondary-800 hover:bg-secondary-50"
                 }`}
-                whileHover={{ y: -2 }}
-                whileTap={{ y: 0 }}
               >
                 <tab.icon className="w-4 h-4" />
                 <span className="text-sm md:text-base">{tab.label}</span>
@@ -566,7 +564,7 @@ function ProductDetailsPage() {
                       <div className="flex items-center justify-between mb-4">
                         <FiHeart className="w-6 h-6 md:w-8 md:h-8 text-success" />
                         <span className="text-xl md:text-2xl font-bold text-success">
-                          {toPersianNumbers(product.likes?.length || 0)}
+                          {toPersianNumbers(product.likesCount || 0)}
                         </span>
                       </div>
                       <h4 className="font-bold text-success mb-1 text-sm md:text-base">
@@ -584,7 +582,7 @@ function ProductDetailsPage() {
                       <div className="flex items-center justify-between mb-4">
                         <FiUsers className="w-6 h-6 md:w-8 md:h-8 text-secondary-700" />
                         <span className="text-xl md:text-2xl font-bold text-secondary-800">
-                          {toPersianNumbers(product.numReviews || 0)}
+                          {toPersianNumbers(product.comments?.length || 0)}
                         </span>
                       </div>
                       <h4 className="font-bold text-secondary-800 mb-1 text-sm md:text-base">

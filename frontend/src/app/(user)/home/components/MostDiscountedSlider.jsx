@@ -1,18 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { useInView } from "react-intersection-observer";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { formatPrice } from "@/utils/formatPrice";
 import { toPersianDigits } from "@/utils/numberFormatter";
 import Image from "next/image";
-import Button from "@/ui/Button";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay, Navigation, Pagination } from "swiper/modules";
+import { Autoplay, Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
-import "swiper/css/pagination";
 import Link from "next/link";
 import { HiChevronLeft } from "react-icons/hi";
 
@@ -24,31 +20,51 @@ export default function MostDiscountedSlider({ products }) {
     seconds: 59,
   });
 
-  // Animation Setup
-  const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.2 });
+  const handleProductClick = useCallback(
+    (productSlug) => {
+      router.push(`/products/${productSlug}`);
+    },
+    [router]
+  );
 
-  const handleProductClick = (productSlug) => {
-    router.push(`/products/${productSlug}`);
-  };
-
-  // Countdown timer effect
+  // Optimized countdown timer - fixed interval and cleanup
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev.seconds > 0) {
-          return { ...prev, seconds: prev.seconds - 1 };
-        } else if (prev.minutes > 0) {
-          return { ...prev, minutes: prev.minutes - 1, seconds: 59 };
-        } else if (prev.hours > 0) {
-          return { ...prev, hours: prev.hours - 1, minutes: 59, seconds: 59 };
-        } else {
-          // Reset timer when it reaches zero
-          return { hours: 23, minutes: 59, seconds: 59 };
-        }
-      });
-    }, 2000);
+    let animationFrameId;
+    let lastUpdateTime = Date.now();
 
-    return () => clearInterval(timer);
+    const updateTimer = () => {
+      const now = Date.now();
+      const elapsed = now - lastUpdateTime;
+
+      // Only update every ~1000ms (1 second) for better performance
+      if (elapsed >= 1000) {
+        setTimeLeft((prev) => {
+          const { hours, minutes, seconds } = prev;
+
+          if (seconds > 0) {
+            return { ...prev, seconds: seconds - 1 };
+          } else if (minutes > 0) {
+            return { ...prev, minutes: minutes - 1, seconds: 59 };
+          } else if (hours > 0) {
+            return { ...prev, hours: hours - 1, minutes: 59, seconds: 59 };
+          } else {
+            // Reset timer when it reaches zero
+            return { hours: 23, minutes: 59, seconds: 59 };
+          }
+        });
+        lastUpdateTime = now;
+      }
+
+      animationFrameId = requestAnimationFrame(updateTimer);
+    };
+
+    animationFrameId = requestAnimationFrame(updateTimer);
+
+    return () => {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+    };
   }, []);
 
   if (products.length === 0) {
@@ -60,17 +76,13 @@ export default function MostDiscountedSlider({ products }) {
   }
 
   return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 30 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 1, ease: "easeInOut" }}
+    <div
       className="overflow-hidden bg-secondary-200 p-4 rounded-3xl mb-12 lg:mb-20 mx-2"
       dir="rtl"
     >
       <div className="max-w-screen-xl mx-auto flex flex-col md:flex-row gap-8 items-start">
         {/* Sidebar */}
-        <div className="md:w-1/4 lg:w-1/5 w-full text-center md:text-right flex flex-col items-center justify-center ">
+        <div className="md:w-1/4 lg:w-1/5 w-full text-center md:text-right flex flex-col items-center justify-center">
           {/* Title */}
           <div className="mb-4">
             <h2 className="text-2xl lg:text-3xl font-black text-secondary-900">
@@ -113,6 +125,7 @@ export default function MostDiscountedSlider({ products }) {
               src="/images/discount.webp"
               alt="discount"
               className="w-full h-full"
+              loading="lazy"
             />
           </div>
 
@@ -128,85 +141,46 @@ export default function MostDiscountedSlider({ products }) {
         {/* Slider with Swiper */}
         <div className="md:w-3/4 lg:w-4/5 w-full relative">
           <Swiper
-            modules={[Autoplay, Navigation, Pagination]}
+            modules={[Autoplay, Navigation]}
             spaceBetween={16}
-            slidesPerView={1.2} // Default for smallest screens
+            slidesPerView={1.2}
             dir="rtl"
             breakpoints={{
-              // Mobile-first approach - start with smaller values
-              320: {
-                slidesPerView: 1.2,
-                spaceBetween: 12,
-              },
-              375: {
-                slidesPerView: 1.3,
-                spaceBetween: 12,
-              },
-              425: {
-                slidesPerView: 1.4,
-                spaceBetween: 14,
-              },
-              480: {
-                slidesPerView: 1.6,
-                spaceBetween: 14,
-              },
-              560: {
-                slidesPerView: 1.8,
-                spaceBetween: 16,
-              },
-              640: {
-                slidesPerView: 2.2,
-                spaceBetween: 16,
-              },
-              768: {
-                slidesPerView: 2.5,
-                spaceBetween: 18,
-              },
-              900: {
-                slidesPerView: 3,
-                spaceBetween: 18,
-              },
-              1024: {
-                slidesPerView: 3.2,
-                spaceBetween: 20,
-              },
-              1200: {
-                slidesPerView: 3.5,
-                spaceBetween: 20,
-              },
-              1280: {
-                slidesPerView: 4,
-                spaceBetween: 20,
-              },
+              320: { slidesPerView: 1.2, spaceBetween: 12 },
+              375: { slidesPerView: 1.3, spaceBetween: 12 },
+              425: { slidesPerView: 1.4, spaceBetween: 14 },
+              480: { slidesPerView: 1.6, spaceBetween: 14 },
+              560: { slidesPerView: 1.8, spaceBetween: 16 },
+              640: { slidesPerView: 2.2, spaceBetween: 16 },
+              768: { slidesPerView: 2.5, spaceBetween: 18 },
+              900: { slidesPerView: 3, spaceBetween: 18 },
+              1024: { slidesPerView: 3.2, spaceBetween: 20 },
+              1200: { slidesPerView: 3.5, spaceBetween: 20 },
+              1280: { slidesPerView: 4, spaceBetween: 20 },
             }}
             autoplay={{
               delay: 4000,
               disableOnInteraction: false,
             }}
             loop={products.length > 3}
-            pagination={false}
             navigation={true}
             className="most-discounted-swiper"
           >
             {products.map((product) => (
               <SwiperSlide key={product._id}>
-                <motion.div
-                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                  className="w-full border border-secondary-300 rounded-xl p-3 bg-secondary-0 cursor-pointer hover:shadow-lg transition-shadow"
+                <div
+                  className="w-full border border-secondary-300 rounded-xl p-3 bg-secondary-0 cursor-pointer hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
                   onClick={() => handleProductClick(product.slug)}
                 >
                   {/* Product Image */}
                   <div className="relative aspect-square mb-3">
                     <Image
-                      src={
-                        product.coverImageUrl ||
-                        "/images/product-placeholder.png"
-                      }
+                      src={product.coverImageUrl}
                       alt={product.title}
                       fill
                       sizes="(max-width: 380px) 140px, (max-width: 640px) 160px, (max-width: 1024px) 200px, 220px"
-                      priority={true}
                       className="object-contain"
+                      loading="lazy"
                     />
 
                     {/* Discount Badge */}
@@ -237,12 +211,12 @@ export default function MostDiscountedSlider({ products }) {
                       </div>
                     </div>
                   </div>
-                </motion.div>
+                </div>
               </SwiperSlide>
             ))}
           </Swiper>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }

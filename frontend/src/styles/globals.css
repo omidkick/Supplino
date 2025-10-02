@@ -85,7 +85,7 @@
   }
 
   .btn--primary {
-    @apply px-3 sm:px-4 py-2.5 sm:py-3 bg-primary-900 text-white hover:text-white hover:bg-primary-800 shadow-lg shadow-primary-300;
+    @apply px-3 sm:px-4 py-2.5 sm:py-3 bg-primary-900 text-white hover:text-white hover:bg-primary-800 shadow-primary-300;
   }
 
   .btn--secondary {
@@ -822,4 +822,84 @@ mark.bg-yellow-300 {
   .most-discounted-swiper .swiper-slide {
     width: 160px !important; /* Smaller cards on mobile */
   }
+}
+
+
+/* React Image Crop Customization */
+.ReactCrop {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.ReactCrop__crop-selection {
+  border: 2px solid rgb(var(--color-primary-600));
+  box-shadow: 0 0 0 9999em rgba(var(--color-secondary-900), 0.3);
+}
+
+.ReactCrop__drag-handle {
+  background: rgb(var(--color-primary-600));
+  border: 2px solid rgb(var(--color-secondary-0));
+  width: 12px;
+  height: 12px;
+}
+
+.ReactCrop__drag-handle.ord-n {
+  top: -6px;
+}
+
+.ReactCrop__drag-handle.ord-s {
+  bottom: -6px;
+}
+
+.ReactCrop__drag-handle.ord-e {
+  right: -6px;
+}
+
+.ReactCrop__drag-handle.ord-w {
+  left: -6px;
+}
+
+.ReactCrop__drag-handle.ord-ne {
+  top: -6px;
+  right: -6px;
+}
+
+.ReactCrop__drag-handle.ord-nw {
+  top: -6px;
+  left: -6px;
+}
+
+.ReactCrop__drag-handle.ord-se {
+  bottom: -6px;
+  right: -6px;
+}
+
+.ReactCrop__drag-handle.ord-sw {
+  bottom: -6px;
+  left: -6px;
+}
+
+.ReactCrop__drag-bar {
+  background: rgb(var(--color-primary-600));
+}
+
+.ReactCrop__drag-bar.ord-n {
+  top: -2px;
+  height: 4px;
+}
+
+.ReactCrop__drag-bar.ord-s {
+  bottom: -2px;
+  height: 4px;
+}
+
+.ReactCrop__drag-bar.ord-e {
+  right: -2px;
+  width: 4px;
+}
+
+.ReactCrop__drag-bar.ord-w {
+  left: -2px;
+  width: 4px;
 }

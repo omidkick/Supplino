@@ -100,7 +100,10 @@ function WorkoutPlanSection() {
   return (
     <div className="md:px-4">
       {/* Header */}
-      <SectionHeader icon={GrSchedules} title="برنامه تمرینی" />
+      <div className="mb-4 md:mb-6 px-4 lg:px-0">
+
+        <SectionHeader icon={GrSchedules} title="برنامه تمرینی" />
+      </div>
 
       {/* Main Content */}
       <motion.div

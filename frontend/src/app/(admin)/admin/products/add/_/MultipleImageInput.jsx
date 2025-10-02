@@ -2,8 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
-import { XMarkIcon, PhotoIcon, PlusIcon } from '@heroicons/react/24/outline';
-import ButtonIcon from '@/ui/ButtonIcon';
+import { XMarkIcon, PhotoIcon, PlusIcon, ArrowUpTrayIcon } from '@heroicons/react/24/outline';
 
 const MultipleImageInput = ({
   value = [],
@@ -136,158 +135,151 @@ const MultipleImageInput = ({
   const hasError = error || (errors && errors[name]);
 
   return (
-<div className="space-y-4">
-  {/* Label with counter */}
-  <div className="flex items-center justify-between">
-    <label htmlFor={`${name}-upload`} className="block text-secondary-700 font-medium">
-      {label}
-      <span className="text-secondary-500 font-normal mr-2">(اختیاری)</span>
-    </label>
-    {previews.length > 0 && (
-      <span className="text-sm text-primary-600 bg-primary-50 px-2 py-1 rounded-full">
-        {previews.length}/{maxFiles} تصاویر
-      </span>
-    )}
-  </div>
-
-  {/* Enhanced Upload Area */}
-  <div className="relative">
-    <input
-      id={`${name}-upload`}
-      type="file"
-      multiple
-      accept="image/*"
-      className="sr-only"
-      onChange={handleFileChange}
-      disabled={previews.length >= maxFiles}
-    />
-    
-    <div className={`
-      group relative overflow-hidden
-      border-2 border-dashed rounded-xl
-      transition-all duration-300 ease-in-out
-      ${previews.length >= maxFiles ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'}
-      ${hasError 
-        ? "border-red-300 bg-red-50/50 hover:border-red-400" 
-        : "border-secondary-200 bg-secondary-50 hover:border-primary-300"
-      }
-    `}>
-      <label 
-        htmlFor={`${name}-upload`}
-        className="flex flex-col items-center justify-center p-8 text-center"
-      >
-        <div className="relative mb-4 cursor-pointer">
-          <div className={`
-            w-16 h-16 flex items-center justify-center rounded-full
-            ${hasError 
-              ? "bg-red-100 text-red-500" 
-              : "bg-primary-50 text-primary-500"
-            }
-          `}>
-            <PhotoIcon className="w-12 h-12" />
-            <PlusIcon className={`
-              absolute -bottom-2 -right-2 w-6 h-6 p-0.5 rounded-full border-2
-              ${hasError 
-                ? "bg-white text-red-500 border-red-200" 
-                : "bg-primary-300 text-primary-900 border-primary-900"
-              }
-            `} />
-          </div>
-        </div>
-        
-        <div className="space-y-2">
-          <h4 className={`
-            text-lg font-medium
-            ${hasError ? "text-red-600" : "text-secondary-700"}
-          `}>
-            {previews.length > 0 ? 'افزودن تصاویر بیشتر' : 'تصاویر محصول را آپلود کنید'}
-          </h4>
-          
-          <p className={`
-            text-sm max-w-md mx-auto
-            ${hasError ? "text-red-500" : "text-secondary-500"}
-          `}>
-            {previews.length >= maxFiles 
-              ? 'حداکثر تعداد تصاویر رسیده است' 
-              : 'فرمت‌های پشتیبانی شده: JPG, PNG, WEBP (حداکثر ۲MB)'
-            }
-          </p>
-          
-          {previews.length < maxFiles && (
-            <button
-              type="button"
-              className={`
-                mt-3 px-4 py-2 text-sm rounded-lg border font-medium
-                transition-colors duration-200
-                ${hasError 
-                  ? "text-red-700 border-red-300 hover:bg-red-50" 
-                  : "text-primary-700 border-primary-300 hover:bg-primary-50"
-                }
-              `}
-            >
-              انتخاب فایل‌ها
-            </button>
-          )}
-        </div>
-      </label>
-    </div>
-  </div>
-
-  {/* Image Previews - Enhanced Grid */}
-  {previews.length > 0 && (
-    <div className="space-y-3">
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
-        {previews.map((preview) => (
-          <div 
-            key={preview.previewId}
-            className="group relative aspect-square rounded-lg overflow-hidden border border-secondary-100 hover:border-primary-300 transition-all duration-200 shadow-sm hover:shadow-md"
-          >
-            <Image
-              fill
-              alt={`product-thumbnail-${preview.previewId}`}
-              src={preview.url}
-              className="object-cover"
-              sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
-            />
-            
-            <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-              <button
-                type="button"
-                onClick={() => removeImage(preview.previewId)}
-                className="absolute top-2 left-2 bg-white/90 text-red-500 p-1 rounded-full hover:bg-white transition-colors duration-200"
-                aria-label="حذف تصویر"
-              >
-                <XMarkIcon className="w-4 h-4" />
-              </button>
-              
-              <span className="absolute bottom-2 left-2 right-2 text-white text-xs bg-black/50 rounded-full px-2 py-1 text-center truncate">
-                {preview.isNew ? 'تصویر جدید' : 'تصویر موجود'}
-              </span>
-            </div>
-          </div>
-        ))}
-        
-        {previews.length < maxFiles && (
-          <label 
-            htmlFor={`${name}-upload`}
-            className="aspect-square flex flex-col items-center justify-center border-2 border-dashed rounded-lg cursor-pointer hover:border-primary-300 hover:bg-primary-50/30 transition-colors duration-200"
-          >
-            <PlusIcon className="w-8 h-8 text-primary-500 mb-2" />
-            <span className="text-sm text-primary-700">افزودن تصویر</span>
-          </label>
+    <div className="space-y-4">
+      {/* Label with counter */}
+      <div className="flex items-center justify-between">
+        <label htmlFor={`${name}-upload`} className="block text-secondary-700 font-medium">
+          {label}
+          <span className="text-secondary-500 font-normal mr-2">(اختیاری)</span>
+        </label>
+        {previews.length > 0 && (
+          <span className="text-sm text-primary-600 bg-primary-50 px-2 py-1 rounded-full">
+            {previews.length}/{maxFiles} تصاویر
+          </span>
         )}
       </div>
-    </div>
-  )}
 
-  {/* Enhanced Error Message */}
-  {hasError && (
-    <div className="mt-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-2">
-      <XMarkIcon className="w-4 h-4 flex-shrink-0 mt-0.5" />
-      <span>{error || errors[name]?.message}</span>
+      {/* Enhanced Upload Area with Integrated Button */}
+      <div className="relative">
+        <input
+          id={`${name}-upload`}
+          type="file"
+          multiple
+          accept="image/*"
+          className="sr-only"
+          onChange={handleFileChange}
+          disabled={previews.length >= maxFiles}
+        />
+        
+        <div className={`
+          group relative overflow-hidden
+          border-2 border-dashed rounded-xl
+          transition-all duration-300 ease-in-out
+          ${previews.length >= maxFiles ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer hover:border-primary-400 hover:bg-primary-50/30'}
+          ${hasError 
+            ? "border-red-300 bg-red-50/50" 
+            : "border-secondary-200 bg-secondary-50"
+          }
+        `}>
+          <label 
+            htmlFor={`${name}-upload`}
+            className="flex flex-col lg:flex-row items-center justify-between p-6 lg:p-8 cursor-pointer"
+          >
+            {/* Left side - Icon and text */}
+            <div className="flex items-center gap-4 mb-4 lg:mb-0">
+              <div className={`
+                w-14 h-14 flex items-center justify-center rounded-xl
+                ${hasError 
+                  ? "bg-red-100 text-red-500" 
+                  : "bg-primary-100 text-primary-600"
+                }
+              `}>
+                <PhotoIcon className="w-8 h-8" />
+              </div>
+              
+              <div className="text-right">
+                <h4 className={`
+                  text-lg font-semibold mb-1
+                  ${hasError ? "text-red-600" : "text-secondary-700"}
+                `}>
+                  {previews.length > 0 ? 'افزودن تصاویر بیشتر' : 'تصاویر محصول را آپلود کنید'}
+                </h4>
+                
+                <p className={`
+                  text-sm
+                  ${hasError ? "text-red-500" : "text-secondary-500"}
+                `}>
+                  {previews.length >= maxFiles 
+                    ? 'حداکثر تعداد تصاویر رسیده است' 
+                    : 'فرمت‌های پشتیبانی شده: JPG, PNG, WEBP (حداکثر ۲MB)'
+                  }
+                </p>
+              </div>
+            </div>
+
+            {/* Right side - Upload Button */}
+            <div className={`
+              flex items-center gap-2 px-6 py-3 rounded-lg border-2 font-medium text-base
+              transition-all duration-200 cursor-pointer
+              ${previews.length >= maxFiles 
+                ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-pointer' 
+                : hasError
+                  ? "bg-white text-red-700 border-red-300 hover:bg-red-50 hover:border-red-400" 
+                  : "bg-primary-900 text-white  hover:bg-primary-800 "
+              }
+            `}>
+              <ArrowUpTrayIcon className="w-5 h-5" />
+              <span>آپلود تصاویر</span>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      {/* Image Previews */}
+      {previews.length > 0 && (
+        <div className="space-y-3 !mt-10" >
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+            {previews.map((preview) => (
+              <div 
+                key={preview.previewId}
+                className="group relative aspect-square rounded-lg overflow-hidden border border-secondary-100 hover:border-primary-300 transition-all duration-200 shadow-sm hover:shadow-md"
+              >
+                <Image
+                  fill
+                  alt={`product-thumbnail-${preview.previewId}`}
+                  src={preview.url}
+                  className="object-contain"
+                  sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                />
+                
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  <button
+                    type="button"
+                    onClick={() => removeImage(preview.previewId)}
+                    className="absolute top-2 left-2 bg-white/90 text-red-500 p-1 rounded-full hover:bg-white transition-colors duration-200"
+                    aria-label="حذف تصویر"
+                  >
+                    <XMarkIcon className="w-4 h-4" />
+                  </button>
+                  
+                  <span className="absolute bottom-2 left-2 right-2 text-white text-xs bg-black/50 rounded-full px-2 py-1 text-center truncate">
+                    {preview.isNew ? 'تصویر جدید' : 'تصویر موجود'}
+                  </span>
+                </div>
+              </div>
+            ))}
+            
+            {previews.length < maxFiles && (
+              <label 
+                htmlFor={`${name}-upload`}
+                className="aspect-square flex flex-col items-center justify-center border-2 border-dashed rounded-lg cursor-pointer hover:border-primary-300 hover:bg-primary-50/30 transition-colors duration-200"
+              >
+                <PlusIcon className="w-8 h-8 text-primary-500 mb-2" />
+                <span className="text-sm text-primary-700">افزودن تصویر</span>
+              </label>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Error Message */}
+      {hasError && (
+        <div className="mt-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-2">
+          <XMarkIcon className="w-4 h-4 flex-shrink-0 mt-0.5" />
+          <span>{error || errors[name]?.message}</span>
+        </div>
+      )}
     </div>
-  )}
-</div>
   );
 };
 

@@ -1,12 +1,12 @@
 import Image from "next/image";
 
-function CoverImage({ title, imageLink, slug, className, coverImage ,coverImageUrl}) {
+function CoverImage({ title, className, coverImageUrl }) {
   return (
     <Image
-      src={coverImageUrl || coverImage || imageLink || "/images/whey-on.png"}
+      src={coverImageUrl}
       alt={title}
       fill
-      priority  
+      priority
       sizes="(max-width: 768px) 95vw, 
              (max-width: 1024px) 50vw, 
              33vw"

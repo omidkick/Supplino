@@ -99,7 +99,9 @@ function NutritionPlanSection() {
   return (
     <div className="md:px-4">
       {/* Header */}
-      <SectionHeader icon={GiFruitBowl} title="برنامه غذایی" />
+      <div className="mb-4 md:mb-6 px-4 lg:px-0">
+        <SectionHeader icon={GiFruitBowl} title="برنامه غذایی" />
+      </div>
 
       {/* Main Content */}
       <motion.div

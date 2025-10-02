@@ -2,18 +2,21 @@
 
 import Loader from "./Loader"; // Import your custom loader
 
-function Loading({ width = "75", height = "40", color = "#4a6dff" }) {
+function Loading({ width = "75", height = "40", color = "#4a6dff", message }) {
   // Map the old props to your new Loader component
   const getSizeClass = () => {
-    if (height === "40") return "h-10 w-10"; // Approximate mapping
-    return "h-12 w-12"; // Default
+    if (height === "40") return "h-10 w-10";
+    return "h-12 w-12";
   };
 
   const getBorderColor = () => {
     switch (color) {
-      case "#4a6dff": return "border-primary-600";
-      case "#ffffff": return "border-white";
-      default: return "border-primary-600";
+      case "#4a6dff":
+        return "border-primary-600";
+      case "#ffffff":
+        return "border-white";
+      default:
+        return "border-primary-600";
     }
   };
 
@@ -21,7 +24,7 @@ function Loading({ width = "75", height = "40", color = "#4a6dff" }) {
     <Loader
       size={getSizeClass()}
       borderColor={getBorderColor()}
-      message=""
+      message={message}
       className="justify-center"
     />
   );

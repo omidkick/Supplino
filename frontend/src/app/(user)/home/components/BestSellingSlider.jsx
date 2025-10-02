@@ -1,35 +1,16 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { motion, useMotionValue, useAnimationFrame } from "framer-motion";
-import { useInView } from "react-intersection-observer";
 import { useRouter } from "next/navigation";
 import { formatPrice } from "@/utils/formatPrice";
 import { toPersianDigits } from "@/utils/numberFormatter";
 import Image from "next/image";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay, Navigation } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
 
 export default function BestSellingSlider({ products }) {
-  const sliderRef = useRef();
   const router = useRouter();
-  const [isHovered, setIsHovered] = useState(false);
-  const x = useMotionValue(0);
-
-  // Animation Setup
-  const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.2 });
-
-  // Auto-scroll using animation frame
-  useAnimationFrame((t, delta) => {
-    if (!isHovered && sliderRef.current && products.length > 3) {
-      const scrollWidth = sliderRef.current.scrollWidth / 2;
-      let currentX = x.get();
-      currentX += (delta / 1000) * 30;
-
-      if (Math.abs(currentX) >= scrollWidth) {
-        currentX = 0;
-      }
-      x.set(currentX);
-    }
-  });
 
   const handleProductClick = (productSlug) => {
     router.push(`/products/${productSlug}`);
@@ -44,48 +25,92 @@ export default function BestSellingSlider({ products }) {
   }
 
   return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 20 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.6, ease: "easeInOut" }}
+    <div
       className="overflow-hidden bg-secondary-100 rounded-3xl lg:mx-12 mb-8 lg:mb-14"
       dir="rtl"
     >
-      <div className="overflow-hidden">
-        <motion.div
-          ref={sliderRef}
-          className="flex flex-nowrap p-4"
-          style={{ x }}
-        >
-          {[...products, ...products].map((product, idx) => (
-            <motion.div
-              key={`${product._id}-${idx}`}
-              onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
-              whileHover={{ scale: 1.05 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              className="flex-shrink-0 w-[220px] sm:w-[250px] border border-secondary-300 rounded-xl p-3 mr-4 bg-secondary-0 cursor-pointer hover:shadow-lg transition-shadow"
+      <Swiper
+        modules={[Autoplay, Navigation]}
+        spaceBetween={16}
+        slidesPerView={1.2}
+        dir="rtl"
+        breakpoints={{
+          280: {
+            slidesPerView: 1.1,
+            spaceBetween: 5,
+          },
+          320: {
+            slidesPerView: 1.2,
+            spaceBetween: 10,
+          },
+          375: {
+            slidesPerView: 1.6,
+            spaceBetween: 10,
+          },
+          425: {
+            slidesPerView: 1.7,
+            spaceBetween: 10,
+          },
+          480: {
+            slidesPerView: 1.8,
+            spaceBetween: 10,
+          },
+          560: {
+            slidesPerView: 2,
+            spaceBetween: 14,
+          },
+          640: {
+            slidesPerView: 2,
+            spaceBetween: 16,
+          },
+          768: {
+            slidesPerView: 2.5,
+            spaceBetween: 18,
+          },
+          900: {
+            slidesPerView: 3,
+            spaceBetween: 18,
+          },
+          1024: {
+            slidesPerView: 3.6,
+            spaceBetween: 20,
+          },
+          1200: {
+            slidesPerView: 4,
+            spaceBetween: 20,
+          },
+          1280: {
+            slidesPerView: 4,
+            spaceBetween: 20,
+          },
+        }}
+        autoplay={{
+          delay: 4000,
+          disableOnInteraction: false,
+        }}
+        loop={products.length > 3}
+        navigation={{
+          nextEl: ".best-selling-swiper-button-next",
+          prevEl: ".best-selling-swiper-button-prev",
+        }}
+        className="best-selling-swiper !px-4 !py-4"
+      >
+        {products.map((product) => (
+          <SwiperSlide key={product._id}>
+            <div
+              className="w-full max-w-[200px] sm:max-w-[220px] md:max-w-[240px] border border-secondary-300 rounded-xl p-3 bg-secondary-0 cursor-pointer hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 mx-auto"
               onClick={() => handleProductClick(product.slug)}
             >
               {/* Product Image */}
               <div className="relative aspect-square mb-3">
                 <Image
-                  src={
-                    product.coverImageUrl || "/images/product-placeholder.png"
-                  }
+                  src={product.coverImageUrl}
                   alt={product.title}
                   fill
-                  sizes="(max-width: 640px) 220px, (max-width: 1024px) 250px, 250px"
-                  priority={true}
+                  sizes="(max-width: 380px) 140px, (max-width: 640px) 160px, (max-width: 1024px) 200px, 220px"
                   className="object-contain"
+                  loading="lazy"
                 />
-
-                {/* Sale Count Badge */}
-                <div className="absolute top-2 left-2 bg-primary-700 text-white px-2 py-1 rounded-full text-xs font-bold">
-                  {toPersianDigits(product.saleCount)} فروش
-                </div>
-
                 {/* Discount Badge */}
                 {product.discount > 0 && (
                   <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold">
@@ -96,14 +121,14 @@ export default function BestSellingSlider({ products }) {
 
               {/* Product Info */}
               <div className="space-y-2">
-                <h3 className="font-bold text-secondary-800 text-sm line-clamp-2 h-10">
+                <h3 className="font-bold text-secondary-800 text-sm line-clamp-2 h-10 leading-5">
                   {product.title}
                 </h3>
 
                 {/* Price */}
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
-                    <div className="font-bold text-primary-900">
+                    <div className="font-bold text-primary-900 text-sm">
                       {formatPrice(product.finalPrice || product.price)}
                     </div>
                     {product.hasDiscount && (
@@ -115,20 +140,54 @@ export default function BestSellingSlider({ products }) {
 
                   {/* Stock Status */}
                   {product.isInStock ? (
-                    <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                    <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full whitespace-nowrap">
                       موجود
                     </span>
                   ) : (
-                    <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full">
+                    <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full whitespace-nowrap">
                       ناموجود
                     </span>
                   )}
                 </div>
               </div>
-            </motion.div>
-          ))}
-        </motion.div>
+            </div>
+          </SwiperSlide>
+        ))}
+      </Swiper>
+
+      {/* Custom Navigation Buttons for Better Mobile UX */}
+      <div className="flex justify-center gap-4 mt-4 md:hidden">
+        <button className="best-selling-swiper-button-prev bg-primary-600 text-white rounded-full p-2 shadow-lg">
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 5l7 7-7 7"
+            />
+          </svg>
+        </button>
+        <button className="best-selling-swiper-button-next bg-primary-600 text-white rounded-full p-2 shadow-lg">
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
+        </button>
       </div>
-    </motion.div>
+    </div>
   );
 }

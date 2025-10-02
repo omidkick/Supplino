@@ -2,7 +2,6 @@
 
 // Imports
 import Button from "@/ui/Button";
-import ButtonIcon from "@/ui/ButtonIcon";
 import FileInput from "@/ui/FileInput";
 import RHFTextField from "@/ui/RHFTextField";
 import RHFTextarea from "@/ui/RHFTextarea";
@@ -50,6 +49,7 @@ const schema = yup
       .min(0, "تخفیف نمی‌تواند منفی باشد")
       .max(100, "تخفیف نمی‌تواند بیشتر از ۱۰۰ درصد باشد")
       .nullable()
+      .required("تخفیف ضروری است")
       .transform((value, originalValue) =>
         originalValue === "" ? null : value
       )
@@ -87,7 +87,6 @@ function AddProductForm({ productToEdit = {} }) {
     discount,
     countInStock,
     category,
-    // imageLink,
     coverImage,
     coverImageUrl: prevCoverImageUrl,
     thumbnailUrls = [],
@@ -109,13 +108,11 @@ function AddProductForm({ productToEdit = {} }) {
       discount: discount || "",
       countInStock,
       category: category?._id || category,
-      // imageLink: imageLink || "",
       coverImage,
     };
   }
 
-  const { categories, isLoadingCategories } = useCategories();
-  // console.log(categories);
+  const { categories } = useCategories();
   const [coverImageUrl, setCoverImageUrl] = useState(prevCoverImageUrl || null);
   const [showPreview, setShowPreview] = useState(true);
   const [thumbnails, setThumbnails] = useState([]);
@@ -173,13 +170,10 @@ function AddProductForm({ productToEdit = {} }) {
       fetchCoverImage();
     }
 
-    // ✅ Fix thumbnail fetching with proper validation
-    // Fix thumbnail initialization
     if (thumbnailUrls?.length > 0) {
       async function fetchThumbnails() {
         const thumbnailPromises = thumbnailUrls.map(async (urlObj) => {
           try {
-            // Handle both string URLs and thumbnail objects
             const url =
               typeof urlObj === "string" ? urlObj : urlObj?.url || urlObj?.path;
             if (!url) return null;
@@ -333,6 +327,7 @@ function AddProductForm({ productToEdit = {} }) {
             label="قیمت با تخفیف (تومان)"
             name="offPrice"
             type="number"
+            isRequired
             register={register}
             errors={errors}
           />
@@ -344,6 +339,7 @@ function AddProductForm({ productToEdit = {} }) {
             type="number"
             register={register}
             errors={errors}
+            isRequired
           />
 
           {/* Category Select */}

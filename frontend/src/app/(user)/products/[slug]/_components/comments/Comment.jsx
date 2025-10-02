@@ -12,6 +12,7 @@ import { faIR } from "date-fns/locale";
 import { toPersianDigits } from "@/utils/numberFormatter";
 import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
+import useOutsideClick from "@/hooks/useOutsideClick";
 
 // Icons
 import {
@@ -35,6 +36,7 @@ import Modal from "@/ui/Modal";
 // Custom user hook
 import { useGetUser } from "@/hooks/useAuth";
 import DeleteConfirmationModal from "./DeleteConfirmationModal";
+import ModalDesk from "@/ui/ModalDesk";
 
 function Comment({ productId }) {
   const { data, isLoading: isLoadingUser } = useGetUser();
@@ -100,6 +102,13 @@ function Comment({ productId }) {
       }
     );
   };
+
+  const replyFormRef = useOutsideClick(() => {
+    if (replyingTo) {
+      setReplyingTo(null);
+      setReplyContent("");
+    }
+  });
 
   const handleLike = (commentId, isLiked) => {
     likeComment(
@@ -188,7 +197,7 @@ function Comment({ productId }) {
       </div>
 
       {/* Comment Modal */}
-      <Modal
+      <ModalDesk
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         title="ثبت نظر جدید"
@@ -230,7 +239,7 @@ function Comment({ productId }) {
             </div>
           </div>
         </div>
-      </Modal>
+      </ModalDesk>
 
       {/* Delete Confirmation Modal */}
       <DeleteConfirmationModal
@@ -285,10 +294,12 @@ function Comment({ productId }) {
                             : comment.user.name}
                         </span>
                         <span className="text-secondary-400 text-xs">
-                          {formatDistanceToNow(new Date(comment.createdAt), {
-                            addSuffix: true,
-                            locale: faIR,
-                          })}
+                          {toPersianDigits(
+                            formatDistanceToNow(new Date(comment.createdAt), {
+                              addSuffix: true,
+                              locale: faIR,
+                            })
+                          )}
                         </span>
                       </div>
                     </div>
@@ -352,6 +363,7 @@ function Comment({ productId }) {
                     <AnimatePresence>
                       {replyingTo === comment._id && (
                         <motion.div
+                          ref={replyFormRef}
                           initial={{ opacity: 0, height: 0 }}
                           animate={{ opacity: 1, height: "auto" }}
                           exit={{ opacity: 0, height: 0 }}
@@ -460,12 +472,14 @@ function Comment({ productId }) {
                                     : answer.user.name}
                                 </span>
                                 <span className="text-secondary-500 text-xs">
-                                  {formatDistanceToNow(
-                                    new Date(answer.createdAt),
-                                    {
-                                      addSuffix: true,
-                                      locale: faIR,
-                                    }
+                                  {toPersianDigits(
+                                    formatDistanceToNow(
+                                      new Date(answer.createdAt),
+                                      {
+                                        addSuffix: true,
+                                        locale: faIR,
+                                      }
+                                    )
                                   )}
                                 </span>
                               </div>

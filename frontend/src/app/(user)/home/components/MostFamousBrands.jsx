@@ -91,7 +91,7 @@ function MostFamousBrands() {
   return (
     <div className="max-w-screen-xl mx-auto my-8 md:px-4 mb-12 lg:mb-16">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 px-4 lg:px-0 gap-y-2">
+       <div className="mb-4 md:mb-6 px-4 lg:px-0">
         <SectionHeader icon={RiStarFill} title="محبوب ترین برندها" />
       </div>
 

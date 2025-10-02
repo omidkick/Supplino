@@ -97,7 +97,7 @@ function PaginationNumber({ page, href, isActive, position }) {
   const className = classNames(
     "flex h-8 w-8 items-center justify-center text-sm font-medium transition-all duration-200 rounded-full",
     {
-      "bg-primary-900 text-white shadow-lg transform scale-110 shadow-primary-200": 
+      "bg-primary-900 text-white transform scale-110 ": 
         isActive,
       " text-secondary-600 hover:bg-secondary-200 hover:text-secondary-800":
         !isActive && position !== "middle",
