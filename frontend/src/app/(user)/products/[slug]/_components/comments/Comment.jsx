@@ -57,6 +57,8 @@ function Comment({ productId }) {
   const [replyingTo, setReplyingTo] = useState(null);
   const [replyContent, setReplyContent] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isReplyModalOpen, setIsReplyModalOpen] = useState(false);
+  const [currentReplyComment, setCurrentReplyComment] = useState(null);
   const [deleteCommentId, setDeleteCommentId] = useState(null);
   const [isDeletingAnswer, setIsDeletingAnswer] = useState(false);
 
@@ -97,10 +99,23 @@ function Comment({ productId }) {
         onSuccess: () => {
           setReplyingTo(null);
           setReplyContent("");
+          setIsReplyModalOpen(false);
+          setCurrentReplyComment(null);
           refetch();
         },
       }
     );
+  };
+
+  const openReplyModal = (comment) => {
+    setCurrentReplyComment(comment);
+    setIsReplyModalOpen(true);
+  };
+
+  const closeReplyModal = () => {
+    setIsReplyModalOpen(false);
+    setCurrentReplyComment(null);
+    setReplyContent("");
   };
 
   const replyFormRef = useOutsideClick(() => {
@@ -148,6 +163,12 @@ function Comment({ productId }) {
   }, [isModalOpen]);
 
   useEffect(() => {
+    if (isReplyModalOpen && replyTextareaRef.current) {
+      replyTextareaRef.current.focus();
+    }
+  }, [isReplyModalOpen]);
+
+  useEffect(() => {
     if (replyingTo && replyTextareaRef.current) {
       replyTextareaRef.current.focus();
     }
@@ -164,6 +185,13 @@ function Comment({ productId }) {
     if (e.key === "Enter" && e.ctrlKey) {
       e.preventDefault();
       handleReply(commentId);
+    }
+  };
+
+  const handleModalReplyKeyPress = (e) => {
+    if (e.key === "Enter" && e.ctrlKey && currentReplyComment) {
+      e.preventDefault();
+      handleReply(currentReplyComment._id);
     }
   };
 
@@ -196,7 +224,7 @@ function Comment({ productId }) {
         </Button>
       </div>
 
-      {/* Comment Modal */}
+      {/* Main Comment Modal */}
       <ModalDesk
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -239,6 +267,86 @@ function Comment({ productId }) {
             </div>
           </div>
         </div>
+      </ModalDesk>
+
+      {/* Reply Modal */}
+      <ModalDesk
+        open={isReplyModalOpen}
+        onClose={closeReplyModal}
+        title={`پاسخ به نظر ${currentReplyComment?.user?.name || "کاربر"}`}
+      >
+        {currentReplyComment && (
+          <div className="space-y-4">
+            {/* Original comment preview */}
+            <div className="bg-secondary-50 rounded-lg p-4 border border-secondary-200">
+              <div className="flex items-center gap-3 mb-2">
+                <Avatar
+                  src={currentReplyComment.user.avatarUrl}
+                  alt={currentReplyComment.user.name}
+                  size="sm"
+                />
+                <div>
+                  <span className="font-bold text-secondary-900 text-sm block">
+                    {currentReplyComment.user.name}
+                  </span>
+                  <span className="text-secondary-500 text-xs">
+                    {toPersianDigits(
+                      formatDistanceToNow(
+                        new Date(currentReplyComment.createdAt),
+                        {
+                          addSuffix: true,
+                          locale: faIR,
+                        }
+                      )
+                    )}
+                  </span>
+                </div>
+              </div>
+              <p className="text-secondary-700 text-sm leading-relaxed">
+                {currentReplyComment.content.text}
+              </p>
+            </div>
+
+            {/* Reply form */}
+            <div className="flex gap-4">
+              <div className="flex-shrink-0">
+                <Avatar src={user?.avatarUrl} alt={user?.name} size="lg" />
+              </div>
+              <div className="flex-1 space-y-4">
+                <TextArea
+                  ref={replyTextareaRef}
+                  value={replyContent}
+                  onChange={(e) => setReplyContent(e.target.value)}
+                  onKeyDown={handleModalReplyKeyPress}
+                  placeholder="پاسخ خود را بنویسید... (Ctrl+Enter برای ارسال)"
+                  rows={4}
+                  className="w-full bg-secondary-0 text-secondary-800 border-secondary-200 focus:border-primary-500 focus:ring-1 focus:ring-primary-200"
+                  id="modal-reply"
+                  name="modal-reply"
+                />
+                <div className="flex justify-end gap-3">
+                  <Button
+                    onClick={closeReplyModal}
+                    variant="outline"
+                    className="shadow-sm text-sm"
+                  >
+                    انصراف
+                  </Button>
+                  <Button
+                    onClick={() => handleReply(currentReplyComment._id)}
+                    loading={isAdding}
+                    disabled={isAdding}
+                    variant="primary"
+                    className="flex items-center justify-center gap-x-2 shadow-sm text-sm"
+                  >
+                    <PaperAirplaneIcon className="w-4 h-4 mr-1" />
+                    ارسال پاسخ
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </ModalDesk>
 
       {/* Delete Confirmation Modal */}
@@ -333,12 +441,9 @@ function Comment({ productId }) {
                         )}
                       </motion.button>
 
+                      {/* Reply Button - Opens Modal */}
                       <motion.button
-                        onClick={() =>
-                          setReplyingTo(
-                            replyingTo === comment._id ? null : comment._id
-                          )
-                        }
+                        onClick={() => openReplyModal(comment)}
                         className="flex items-center gap-1 text-sm text-secondary-500 hover:text-primary-600 transition-colors"
                         whileHover={{ scale: 1.02 }}
                       >
@@ -359,67 +464,69 @@ function Comment({ productId }) {
                       )}
                     </div>
 
-                    {/* Reply form */}
-                    <AnimatePresence>
-                      {replyingTo === comment._id && (
-                        <motion.div
-                          ref={replyFormRef}
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: "auto" }}
-                          exit={{ opacity: 0, height: 0 }}
-                          transition={{ duration: 0.3 }}
-                          className="mt-4"
-                        >
-                          <div className="flex gap-3">
-                            <div className="flex-shrink-0">
-                              <Avatar
-                                src={user?.avatarUrl}
-                                alt={user?.name}
-                                size="sm"
-                                width={36}
-                              />
-                            </div>
-                            <div className="flex-1">
-                              <TextArea
-                                ref={replyTextareaRef}
-                                value={replyContent}
-                                onChange={(e) =>
-                                  setReplyContent(e.target.value)
-                                }
-                                onKeyDown={(e) =>
-                                  handleReplyKeyPress(e, comment._id)
-                                }
-                                placeholder="پاسخ خود را بنویسید... (Ctrl+Enter برای ارسال)"
-                                rows={2}
-                                className="w-full text-sm text-secondary-800 border-secondary-200 focus:border-primary-500 focus:ring-1 focus:ring-primary-200"
-                                id={`reply-${comment._id}`}
-                                name={`reply-${comment._id}`}
-                              />
-                              <div className="flex justify-end gap-2 mt-2">
-                                <Button
-                                  onClick={() => setReplyingTo(null)}
-                                  variant="ghost"
-                                  size="xs"
-                                >
-                                  انصراف
-                                </Button>
-                                <Button
-                                  onClick={() => handleReply(comment._id)}
-                                  loading={isAdding}
-                                  disabled={isAdding}
-                                  variant="primary"
-                                  size="xs"
-                                  className="flex items-center gap-1"
-                                >
-                                  <PaperAirplaneIcon className="w-3 h-3" />
-                                  ارسال
-                                </Button>
+                    {/* Inline Reply Form (for desktop) - Hidden on mobile */}
+                    <div className="hidden md:block">
+                      <AnimatePresence>
+                        {replyingTo === comment._id && (
+                          <motion.div
+                            ref={replyFormRef}
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.3 }}
+                            className="mt-4"
+                          >
+                            <div className="flex gap-3">
+                              <div className="flex-shrink-0">
+                                <Avatar
+                                  src={user?.avatarUrl}
+                                  alt={user?.name}
+                                  size="sm"
+                                  width={36}
+                                />
+                              </div>
+                              <div className="flex-1">
+                                <TextArea
+                                  ref={replyTextareaRef}
+                                  value={replyContent}
+                                  onChange={(e) =>
+                                    setReplyContent(e.target.value)
+                                  }
+                                  onKeyDown={(e) =>
+                                    handleReplyKeyPress(e, comment._id)
+                                  }
+                                  placeholder="پاسخ خود را بنویسید... (Ctrl+Enter برای ارسال)"
+                                  rows={2}
+                                  className="w-full text-sm text-secondary-800 border-secondary-200 focus:border-primary-500 focus:ring-1 focus:ring-primary-200"
+                                  id={`reply-${comment._id}`}
+                                  name={`reply-${comment._id}`}
+                                />
+                                <div className="flex justify-end gap-2 mt-2">
+                                  <Button
+                                    onClick={() => setReplyingTo(null)}
+                                    variant="ghost"
+                                    size="xs"
+                                  >
+                                    انصراف
+                                  </Button>
+                                  <Button
+                                    onClick={() => handleReply(comment._id)}
+                                    loading={isAdding}
+                                    disabled={isAdding}
+                                    variant="primary"
+                                    size="xs"
+                                    className="flex items-center gap-1"
+                                  >
+                                    <PaperAirplaneIcon className="w-3 h-3" />
+                                    ارسال
+                                  </Button>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
                   </div>
 
                   {/* Vertical line for replies */}
@@ -518,9 +625,15 @@ function Comment({ productId }) {
                                 )}
                               </motion.button>
 
-                              <button className="flex items-center gap-1 text-sm text-secondary-500 hover:text-primary-600 transition-colors">
+                              {/* Reply to reply - Opens Modal */}
+                              <motion.button
+                                onClick={() => openReplyModal(comment)}
+                                className="flex items-center gap-1 text-sm text-secondary-500 hover:text-primary-600 transition-colors"
+                                whileHover={{ scale: 1.02 }}
+                              >
+                                <ArrowUturnRightIcon className="w-4 h-4" />
                                 <span className="text-xs">پاسخ</span>
-                              </button>
+                              </motion.button>
 
                               {user?._id === answer.user._id && (
                                 <motion.button
