@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import Link from "next/link";
-import { useState, useEffect } from "react"; // Add useEffect
+import { useMemo, useState, useEffect } from "react";
 
 // UI Components
 import Button from "@/ui/Button";
@@ -20,6 +20,26 @@ import { toPersianDigits } from "@/utils/numberFormatter";
 import useCartActions from "@/hooks/useCartActions";
 import { useGetUser } from "@/hooks/useAuth";
 
+// Custom hook for cart state management
+function useCartState(product) {
+  const { data } = useGetUser();
+  const { user } = data || {};
+
+  return useMemo(() => {
+    if (!user || !user.cart?.products) {
+      return { isInCart: false, quantity: 0 };
+    }
+
+    const cartItem = user.cart.products.find(
+      (p) => p.productId === product._id
+    );
+    return {
+      isInCart: !!cartItem,
+      quantity: cartItem?.quantity || 0,
+    };
+  }, [user, product._id]);
+}
+
 export default function AddToCart({
   product,
   className = "",
@@ -32,31 +52,23 @@ export default function AddToCart({
   const router = useRouter();
   const { data } = useGetUser();
   const { user } = data || {};
-  
-  // Add state to track if component is mounted
-  const [isMounted, setIsMounted] = useState(false);
+
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    setIsMounted(true);
+    setIsClient(true);
   }, []);
 
-  // Helper functions
-  const isInCart = (user, product) => {
-    if (!user || !user.cart?.products) return false;
-    return user.cart.products.some((p) => p.productId === product._id);
-  };
+  const { isInCart, quantity } = useCartState(product);
 
-  const getCartItemQuantity = (user, product) => {
-    if (!user || !user.cart?.products) return 0;
-    const cartItem = user.cart.products.find(
-      (p) => p.productId === product._id
-    );
-    return cartItem ? cartItem.quantity : 0;
-  };
+  // Derived states
+  const isOutOfStock = product.countInStock === 0;
+  const isDisabled = disabled || isOutOfStock || isAdding;
+  const isMaxQuantityReached = quantity >= product.countInStock;
 
   // Event handlers
   const handleAddToCart = (e) => {
-    if (e) e.stopPropagation(); // Prevent event bubbling
+    e?.stopPropagation();
 
     if (!user) {
       toast.error("لطفا ابتدا وارد حساب کاربری خود شوید !");
@@ -69,129 +81,146 @@ export default function AddToCart({
       return;
     }
 
+    if (isAdding) return;
+
     addToCart(product._id);
   };
 
   const handleRemoveFromCart = (e) => {
-    if (e) e.stopPropagation(); // Prevent event bubbling
+    e?.stopPropagation();
+    if (isRemoving) return;
     removeFromCart(product._id);
   };
 
-  // State calculations
-  const isProductInCart = isInCart(user, product);
-  const cartQuantity = getCartItemQuantity(user, product);
-  const isOutOfStock = product.countInStock === 0;
-  const isDisabled = disabled || isOutOfStock;
-  const isMaxQuantityReached = cartQuantity >= product.countInStock;
-
-  // Don't render anything until component is mounted to avoid hydration mismatch
-  if (!isMounted) {
+  if (!isClient) {
     return (
       <div className={className}>
-        <Button
-          variant="primary"
-          className="w-full py-2.5 sm:py-3 text-sm sm:text-base font-bold"
-          disabled={true}
-        >
-          <MiniLoading width="50" height="25" color="#ffffff" />
-        </Button>
+        <div className="w-full py-2.5 sm:py-3 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
       </div>
     );
   }
 
-  // If product is in cart, show quantity controls and cart link
-  if (isProductInCart) {
-    return (
-      <div className={`space-y-4 ${className}`}>
-        {/* Quantity Selector */}
-        {showQuantityControls && (
-          <div
-            className={`flex items-center gap-3 sm:gap-4 ${quantitySelectorClassName}`}
-          >
-            <span className="text-secondary-700 font-medium text-sm sm:text-base">
-              تعداد:
-            </span>
-            <div className="flex items-center border border-secondary-200 rounded-lg">
-              {/* Increase quantity button */}
-              <button
-                onClick={handleAddToCart}
-                className="p-1.5 sm:p-2 hover:bg-secondary-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={isMaxQuantityReached || isAdding || isOutOfStock}
-                title={isMaxQuantityReached ? "حداکثر موجودی" : "افزایش تعداد"}
-              >
-                <PlusIcon className="w-3 h-3 sm:w-4 sm:h-4" />
-              </button>
+  // Loading state component
+  const LoadingState = () => (
+    <Button
+      variant="primary"
+      className="w-full py-2.5 sm:py-3 text-sm sm:text-base font-bold flex items-center justify-center"
+      disabled
+    >
+      <MiniLoading size="sm" className="border-primary-700" />
+    </Button>
+  );
 
-              {/* Quantity display */}
-              <span className="px-3 sm:px-4 py-1.5 sm:py-2 border-x border-secondary-200 min-w-[40px] sm:min-w-[50px] text-center text-sm sm:text-base">
-                {isAdding || isRemoving ? (
-                  <MiniLoading color="#3860cc" />
-                ) : (
-                  toPersianDigits(cartQuantity)
-                )}
-              </span>
-
-              {/* Decrease quantity button */}
-              <button
-                onClick={handleRemoveFromCart}
-                className="p-1.5 sm:p-2 hover:bg-secondary-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={isRemoving}
-                title={cartQuantity === 1 ? "حذف از سبد خرید" : "کاهش تعداد"}
-              >
-                {cartQuantity === 1 ? (
-                  <TrashIcon className="w-3 h-3 sm:w-4 sm:h-4 text-red-500" />
-                ) : (
-                  <MinusIcon className="w-3 h-3 sm:w-4 sm:h-4" />
-                )}
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Go to Cart Link */}
-        <Link
-          href="/cart"
-          className={`block ${linkClassName}`}
-          onClick={(e) => e.stopPropagation()}
+  // Quantity Selector Component
+  const QuantitySelector = () => (
+    <div
+      className={`flex items-center gap-3 sm:gap-4 ${quantitySelectorClassName}`}
+    >
+      <span className="text-secondary-700 font-medium text-sm sm:text-base">
+        تعداد:
+      </span>
+      <div className="flex items-center border border-secondary-200 rounded-lg">
+        <button
+          onClick={handleAddToCart}
+          className="p-1.5 sm:p-2 hover:bg-secondary-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={
+            isMaxQuantityReached || isAdding || isOutOfStock || isRemoving
+          }
+          title={isMaxQuantityReached ? "حداکثر موجودی" : "افزایش تعداد"}
         >
-          <Button
-            variant="outline"
-            className="w-full py-2.5 sm:py-3 text-sm sm:text-base font-bold"
-          >
-            مشاهده سبد خرید
-          </Button>
-        </Link>
-      </div>
-    );
-  }
+          <PlusIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+        </button>
 
-  // If product is not in cart, show add to cart button
-  return (
+        <span className="px-3 sm:px-4 py-1.5 sm:py-2 border-x border-secondary-200 min-w-[40px] sm:min-w-[50px] text-center text-sm sm:text-base">
+          {isAdding || isRemoving ? (
+            <MiniLoading size="sm" className="border-primary-600 mx-auto" />
+          ) : (
+            toPersianDigits(quantity)
+          )}
+        </span>
+
+        <button
+          onClick={handleRemoveFromCart}
+          className="p-1.5 sm:p-2 hover:bg-secondary-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={isRemoving || isAdding}
+          title={quantity === 1 ? "حذف از سبد خرید" : "کاهش تعداد"}
+        >
+          {quantity === 1 ? (
+            <TrashIcon className="w-3 h-3 sm:w-4 sm:h-4 text-red-500" />
+          ) : (
+            <MinusIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+          )}
+        </button>
+      </div>
+    </div>
+  );
+
+  // Cart Link Component
+  const CartLink = () => (
+    <Link
+      href="/cart"
+      className={`block ${linkClassName}`}
+      onClick={(e) => e.stopPropagation()}
+    >
+      <Button
+        variant="outline"
+        className="w-full py-2.5 sm:py-3 text-sm sm:text-base font-bold"
+        disabled={isAdding || isRemoving}
+      >
+        مشاهده سبد خرید
+      </Button>
+    </Link>
+  );
+
+  // Add to Cart Button Component
+  const AddToCartButton = () => (
     <motion.div
       whileHover={{ scale: isDisabled ? 1 : 1.02 }}
       whileTap={{ scale: isDisabled ? 1 : 0.98 }}
-      className={className}
     >
-      {isAdding ? (
-        <Button
-          variant="primary"
-          className="w-full py-2.5 sm:py-3 text-sm sm:text-base font-bold"
-          disabled={true}
-        >
-          <MiniLoading width="50" height="25" color="#ffffff" />
-        </Button>
-      ) : (
-        <Button
-          variant={isOutOfStock ? "secondary" : "primary"}
-          className={`w-full py-2.5 sm:py-3 text-sm sm:text-base font-bold !shadow-md transition-all duration-200 ${
-            isOutOfStock ? "!bg-gray-300 !text-gray-600 cursor-not-allowed" : ""
-          }`}
-          onClick={handleAddToCart}
-          disabled={isDisabled}
-        >
-          {isOutOfStock ? "ناموجود" : "افزودن به سبد خرید"}
-        </Button>
-      )}
+      <Button
+        variant={isOutOfStock ? "secondary" : "primary"}
+        className={`w-full py-2.5 sm:py-3 text-sm sm:text-base font-bold !shadow-md transition-all duration-200 ${
+          isOutOfStock ? "!bg-gray-300 !text-gray-600 cursor-not-allowed" : ""
+        } ${isAdding ? "opacity-70 cursor-not-allowed" : ""}`}
+        onClick={handleAddToCart}
+        disabled={isDisabled || isAdding}
+      >
+        {isAdding ? (
+          <div className="flex items-center justify-center gap-2">
+            <MiniLoading size="sm" className="border-white" />
+            <span>در حال افزودن...</span>
+          </div>
+        ) : isOutOfStock ? (
+          "ناموجود"
+        ) : (
+          "افزودن به سبد خرید"
+        )}
+      </Button>
     </motion.div>
+  );
+
+  // Main render logic
+  if (isAdding && !isInCart) {
+    return (
+      <div className={className}>
+        <LoadingState />
+      </div>
+    );
+  }
+
+  if (isInCart) {
+    return (
+      <div className={`space-y-4 ${className}`}>
+        {showQuantityControls && <QuantitySelector />}
+        <CartLink />
+      </div>
+    );
+  }
+
+  return (
+    <div className={className}>
+      <AddToCartButton />
+    </div>
   );
 }

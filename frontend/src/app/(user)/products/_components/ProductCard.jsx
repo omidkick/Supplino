@@ -1,9 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  StarIcon,
-} from "@heroicons/react/24/outline";
+import { StarIcon } from "@heroicons/react/24/outline";
 import { StarIcon as StarIconSolid } from "@heroicons/react/24/solid";
 import { toPersianDigits } from "@/utils/numberFormatter";
 import CoverImage from "./CoverImage";
@@ -15,12 +13,11 @@ import { useGetUser } from "@/hooks/useAuth";
 import toast from "react-hot-toast";
 import AddToCart from "./AddToCart";
 
-import { useProductActions } from "@/hooks/useProducts"; 
+import { useProductActions } from "@/hooks/useProducts";
 
 const ProductCard = ({ product: serverProduct }) => {
   const { product: clientProduct } = useProductActions(serverProduct?._id);
-  const product = clientProduct || serverProduct; 
-
+  const product = clientProduct || serverProduct;
 
   // Calculate discount percentage
   const discountPercentage = product.discount || 0;
@@ -196,7 +193,6 @@ const ProductCard = ({ product: serverProduct }) => {
               showQuantityControls={false}
               disabled={isOutOfStock}
               className="!mt-2"
-              buttonClassName="py-1.5 text-xs md:text-sm"
             />
           </div>
         </div>

@@ -85,7 +85,7 @@
   }
 
   .btn--primary {
-    @apply px-3 sm:px-4 py-2.5 sm:py-3 bg-primary-900 text-white hover:text-white hover:bg-primary-800 shadow-primary-300;
+    @apply px-3 sm:px-4 py-2.5 sm:py-3 bg-primary-900 text-white hover:bg-primary-800 ;
   }
 
   .btn--secondary {
@@ -903,3 +903,30 @@ mark.bg-yellow-300 {
   left: -2px;
   width: 4px;
 }
+
+/* Ensure proper viewport height on mobile */
+html {
+  height: -webkit-fill-available;
+}
+
+body {
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+}
+
+/* Improve scrolling behavior */
+@media (max-width: 768px) {
+  html {
+    scroll-padding-top: 80px; /* Adjust based on your header height */
+  }
+}
+
+/* Safe area support */
+@supports(padding: max(0px)) {
+  .safe-area-bottom {
+    padding-bottom: max(env(safe-area-inset-bottom), 1rem);
+  }
+}
+
+
+

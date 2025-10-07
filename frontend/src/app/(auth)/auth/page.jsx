@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -24,7 +23,7 @@ function AuthPage() {
 
   // Set the current step for the step indicator
   useEffect(() => {
-    setCurrentStep(1); // Authentication step
+    setCurrentStep(2); // Authentication step
   }, [setCurrentStep]);
 
   const {
@@ -36,9 +35,11 @@ function AuthPage() {
     mutationFn: getOtp,
   });
 
-  const { mutateAsync: mutateCheckOtp, isPending: isCheckingOtp } = useMutation({
-    mutationFn: checkOtp,
-  });
+  const { mutateAsync: mutateCheckOtp, isPending: isCheckingOtp } = useMutation(
+    {
+      mutationFn: checkOtp,
+    }
+  );
 
   const phoneNumberHandler = (e) => {
     setPhoneNumber(e.target.value);

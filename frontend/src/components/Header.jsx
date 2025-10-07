@@ -45,11 +45,11 @@ function Header() {
 
   const headerClasses = `sticky top-0 z-40 transition-all duration-300 backdrop-blur-sm ${
     isLoading ? "blur-sm opacity-70" : "opacity-100 blur-0"
-  } ${isScrolled ? "bg-secondary-100/80 " : "bg-secondary-100 "}`;
+  } ${isScrolled ? "bg-secondary-100/80 shadow-sm" : "bg-secondary-100"}`;
 
   return (
     <>
-      {/* Mobile Top Header */}
+      {/* Mobile Top Header - FIXED: Added proper sticky behavior */}
       <header className={`md:hidden ${headerClasses}`}>
         <nav className="px-4 py-3">
           <div className="flex items-center justify-between">
@@ -63,7 +63,7 @@ function Header() {
       </header>
 
       {/* Desktop Header */}
-      <header className={`hidden md:block  mb-10 ${headerClasses}`}>
+      <header className={`hidden md:block mb-10 ${headerClasses}`}>
         <nav className="container xl:max-w-screen-xl mx-auto px-4">
           <div className="flex items-center justify-between py-2">
             <Logo />
@@ -85,16 +85,16 @@ function Header() {
         isLoading={isLoading}
       />
 
-      {/* Mobile Spacers */}
-      <div className="md:hidden mb-4" />
+      {/* Mobile Spacers - ADJUSTED: Increased bottom padding for better spacing */}
+      <div className="md:hidden mb-20" />
     </>
   );
 }
-
 // Logo Component
 const Logo = () => (
   <NavLink path="/home">
-    <img src="/images/logo.png" alt="logo" className="w-28 max-h-24" />
+    <img src="/images/logo.png" alt="logo" className="w-28 max-h-24 hidden md:block" />
+    <img src="/images/logo (1).png" alt="logo" className="w-auto max-h-8 md:hidden " />
   </NavLink>
 );
 
@@ -107,7 +107,7 @@ const UserSection = ({ user, router }) =>
       onClick={() => router.push("/auth")}
       className="btn btn--primary flex items-center gap-1 py-2.5 text-xs"
     >
-      <HiArrowLeftOnRectangle className="w-5 h-5" />
+      <HiArrowLeftOnRectangle className="w-5 h-5 hidden md:block" />
       ورود | ثبت نام
     </Button>
   );

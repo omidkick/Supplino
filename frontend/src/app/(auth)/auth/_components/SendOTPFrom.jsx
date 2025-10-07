@@ -2,88 +2,74 @@ import Loading from "@/ui/Loading";
 import TextField from "@/ui/TextField";
 import { motion } from "framer-motion";
 
-// Animation variants optimized for mobile
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.15,
-      delayChildren: 0.1,
+      staggerChildren: 0.1,
+      delayChildren: 0.05,
     },
   },
 };
 
 const itemVariants = {
-  hidden: {
-    y: 15,
-    opacity: 0,
-  },
+  hidden: { y: 10, opacity: 0 },
   visible: {
     y: 0,
     opacity: 1,
     transition: {
-      type: "spring",
-      stiffness: 120,
-      damping: 15,
-      duration: 0.5,
+      type: "tween",
+      duration: 0.2,
     },
   },
 };
 
 const headerVariants = {
-  hidden: {
-    y: -10,
-    opacity: 0,
-  },
+  hidden: { y: -8, opacity: 0 },
   visible: {
     y: 0,
     opacity: 1,
     transition: {
-      type: "spring",
-      stiffness: 100,
-      damping: 12,
-      duration: 0.6,
+      type: "tween",
+      duration: 0.25,
     },
   },
 };
 
 const formVariants = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 0, y: 15 },
   visible: {
     opacity: 1,
     y: 0,
     transition: {
-      type: "spring",
-      stiffness: 90,
-      damping: 15,
-      duration: 0.7,
-      staggerChildren: 0.2,
-      delayChildren: 0.3,
+      type: "tween",
+      duration: 0.3,
+      staggerChildren: 0.15,
+      delayChildren: 0.2,
     },
   },
 };
 
 const buttonVariants = {
-  hidden: {
-    y: 10,
-    opacity: 0,
-    scale: 0.95,
-  },
+  hidden: { y: 8, opacity: 0 },
   visible: {
     y: 0,
     opacity: 1,
-    scale: 1,
     transition: {
-      type: "spring",
-      stiffness: 100,
-      damping: 12,
-      duration: 0.6,
+      type: "tween",
+      duration: 0.2,
     },
   },
 };
 
 function SendOTPFrom({ phoneNumber, onChange, onSubmit, isLoading }) {
+  const handlePhoneChange = (e) => {
+    const numericValue = e.target.value.replace(/[^0-9]/g, "");
+    e.target.value = numericValue;
+    onChange(e);
+  };
+
   return (
     <motion.div variants={containerVariants} initial="hidden" animate="visible">
       {/* Header */}
@@ -106,7 +92,7 @@ function SendOTPFrom({ phoneNumber, onChange, onSubmit, isLoading }) {
       </motion.p>
 
       <motion.form
-        className="space-y-10"
+        className="space-y-8"
         onSubmit={onSubmit}
         variants={formVariants}
       >
@@ -116,7 +102,12 @@ function SendOTPFrom({ phoneNumber, onChange, onSubmit, isLoading }) {
             name="phoneNumber"
             id="phoneNumber"
             value={phoneNumber}
-            onChange={onChange}
+            onChange={handlePhoneChange}
+            type="tel"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            placeholder="09××××××××"
+            dir="ltr"
           />
         </motion.div>
 
@@ -124,7 +115,12 @@ function SendOTPFrom({ phoneNumber, onChange, onSubmit, isLoading }) {
           {isLoading ? (
             <Loading />
           ) : (
-            <button type="submit" className="btn btn--primary w-full">
+            <button
+              type="submit"
+              className="btn btn--primary w-full"
+              disabled={!phoneNumber || phoneNumber.length < 11 || isLoading}
+              id="send-otp-btn"
+            >
               ارسال کد تایید
             </button>
           )}

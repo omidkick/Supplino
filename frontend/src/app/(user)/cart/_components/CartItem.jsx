@@ -91,7 +91,7 @@ function CartItem({ cartItem }) {
           {/* Quantity display */}
           <span className="px-3 sm:px-4 py-1.5 sm:py-2 border-x border-secondary-200 min-w-[40px] sm:min-w-[50px] text-center text-sm sm:text-base">
             {isAdding || isRemoving ? (
-              <MiniLoading color="#3860cc" />
+              <MiniLoading className="border-primary-600 mx-auto" />
             ) : (
               toPersianDigits(cartQuantity)
             )}
