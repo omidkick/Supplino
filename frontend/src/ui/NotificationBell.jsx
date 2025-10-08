@@ -84,7 +84,7 @@ const NotificationBell = ({ isAdmin = false }) => {
         className="relative flex items-center justify-center transition-colors duration-200"
         whileTap={{ scale: 0.95 }}
       >
-        <BellIcon className="w-6 h-6 md:w-7 md:h-7 text-primary-900" />
+        <BellIcon className="w-7 h-7 text-primary-900" />
         
         {/* Notification Badge */}
         {unreadCount > 0 && (

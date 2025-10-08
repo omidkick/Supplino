@@ -291,13 +291,10 @@ function Comment({ productId }) {
                   </span>
                   <span className="text-secondary-500 text-xs">
                     {toPersianDigits(
-                      formatDistanceToNow(
-                        new Date(currentReplyComment.createdAt),
-                        {
-                          addSuffix: true,
-                          locale: faIR,
-                        }
-                      )
+                      formatDistanceToNow(new Date(currentReplyComment.createdAt), {
+                        addSuffix: true,
+                        locale: faIR,
+                      })
                     )}
                   </span>
                 </div>

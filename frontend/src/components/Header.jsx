@@ -49,7 +49,7 @@ function Header() {
 
   return (
     <>
-      {/* Mobile Top Header - FIXED: Added proper sticky behavior */}
+      {/* Mobile Top Header */}
       <header className={`md:hidden ${headerClasses}`}>
         <nav className="px-4 py-3">
           <div className="flex items-center justify-between">
@@ -85,7 +85,7 @@ function Header() {
         isLoading={isLoading}
       />
 
-      {/* Mobile Spacers - ADJUSTED: Increased bottom padding for better spacing */}
+      {/* Mobile Spacers */}
       <div className="md:hidden mb-20" />
     </>
   );

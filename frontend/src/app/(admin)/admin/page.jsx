@@ -76,14 +76,14 @@ function AdminContent() {
       </div>
 
       {/* Charts Section  */}
-      <div className="mb-10 md:mb-14 lg:mb-18 ">
+      <div className="mb-10 md:mb-14 lg:mb-18 flex flex-col justify-center ">
         {/* Sales Chart */}
-        <div className="mb-8 md:mb-10">
+        <div className="mb-8 md:mb-10 flex-1">
           <SalesChart payments={payments} />
         </div>
 
         {/* Products Donut Chart */}
-        <div className="">
+        <div className="flex-1">
           <ProductsDonutChart products={products} />
         </div>
       </div>

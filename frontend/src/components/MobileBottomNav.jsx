@@ -10,17 +10,8 @@ const MobileBottomNav = ({ user, cartItemsCount, navLinks, isLoading }) => {
       className={`fixed bottom-0 inset-x-0 z-50 bg-secondary-100 dark:bg-secondary-50 rounded-t-2xl border-t dark:border-secondary-200 border-secondary-300 shadow-sm md:hidden ${
         isLoading ? "blur-sm opacity-70" : "opacity-100 blur-0"
       }`}
-      style={{
-        // Ensure it stays at the bottom on mobile Safari
-        position: 'fixed',
-        bottom: '0',
-        left: '0',
-        right: '0',
-        // Add safe area inset for modern mobile devices
-        paddingBottom: 'env(safe-area-inset-bottom, 0)'
-      }}
     >
-      <ul className="flex justify-around items-center px-4 py-3">
+      <ul className="flex justify-around items-center px-4 py-2">
         {navLinks.map((link) => (
           <li key={link.id}>
             <NavLink

@@ -11,39 +11,39 @@ function CardsWrapper({
 }) {
   const stats = [
     {
-      title: "تعداد کاربران",
+      title: " کاربران",
       value: users?.length,
       type: "users",
     },
     {
-      title: "تعداد سفارشات",
+      title: " سفارشات",
       value: payments,
       type: "payments",
     },
     {
-      title: "تعداد محصولات",
+      title: " محصولات",
       value: products,
       type: "products",
     },
     {
-      title: "تعداد دسته‌بندی‌ها",
+      title: " دسته‌بندی‌ها",
       value: categories?.length,
       type: "categories",
     },
     {
-      title: "تعداد تیکت‌ها",
+      title: " تیکت‌ها",
       value: tickets,
       type: "tickets",
     },
     {
-      title: "تعداد نظرات",
+      title: " نظرات",
       value: comments,
       type: "comments",
     },
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+    <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-3 gap-6">
       {stats.map((item) => (
         <Card
           key={item.type}

@@ -85,7 +85,7 @@
   }
 
   .btn--primary {
-    @apply px-3 sm:px-4 py-2.5 sm:py-3 bg-primary-900 text-white hover:bg-primary-800 ;
+    @apply px-3 sm:px-4 py-2.5 sm:py-3 bg-primary-900 text-white hover:bg-primary-800;
   }
 
   .btn--secondary {
@@ -161,8 +161,7 @@
   .badge--teal {
     @apply bg-teal-600 text-white;
   }
-
-  /* Updated Comment Styles */
+/* Updated Comment Styles */
   .comment-thread {
     @apply relative;
   }
@@ -280,7 +279,7 @@
   .comment-reply-btn {
     @apply flex items-center gap-1 text-sm text-secondary-500 hover:text-primary-600 transition-colors;
   }
-
+  
   .spinner {
     margin: 3.2rem auto 1.6rem;
     width: 60px;
@@ -824,7 +823,6 @@ mark.bg-yellow-300 {
   }
 }
 
-
 /* React Image Crop Customization */
 .ReactCrop {
   border-radius: 12px;
@@ -922,11 +920,8 @@ body {
 }
 
 /* Safe area support */
-@supports(padding: max(0px)) {
+@supports (padding: max(0px)) {
   .safe-area-bottom {
     padding-bottom: max(env(safe-area-inset-bottom), 1rem);
   }
 }
-
-
-

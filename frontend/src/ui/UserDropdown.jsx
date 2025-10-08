@@ -52,7 +52,7 @@ function UserDropdown({ user }) {
         onClick={() => setIsOpen((prev) => !prev)}
         className="flex items-center gap-1 p-2 rounded-lg text-secondary-500 hover:text-primary-700 hover:bg-secondary-200 transition md:text-base text-sm"
       >
-        <HiUserCircle className="w-7 h-7" />
+        <HiUserCircle className="w-8 h-8" />
         <motion.div
           variants={chevronVariants}
           animate={isOpen ? "open" : "closed"}

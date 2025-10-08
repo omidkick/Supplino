@@ -6,7 +6,6 @@ import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 import Drawer from "@/ui/Drawer";
 import GreetingMessage from "@/ui/GreetingMessage";
-import { HiUserCircle } from "react-icons/hi";
 import { useGetUser } from "@/hooks/useAuth";
 import ButtonIcon from "@/ui/ButtonIcon";
 import AdminSideBar from "./AdminSideBar";
@@ -38,7 +37,7 @@ function Header({}) {
           </ButtonIcon>
 
           {/* Say Hello */}
-          <span className="flex flex-col lg:flex-row lg:items-center">
+          <span className="hidden md:flex flex-col lg:flex-row lg:items-center">
             <span className="text-sm lg:text-lg font-bold text-secondary-700">
               سلام؛ {user?.name}
             </span>
@@ -53,8 +52,8 @@ function Header({}) {
         <div className="flex items-center gap-x-4 md:gap-x-5">
           <NotificationBell isAdmin={true} />
           <DarkModeToggle />
-          <Link href="/admin">
-            <Avatar src={user?.avatarUrl} width={38} mobileWidth={30} />
+          <Link href="/admin" className="mr-3">
+            <Avatar src={user?.avatarUrl} width={43} mobileWidth={38} />
           </Link>
         </div>
 

@@ -58,7 +58,7 @@ export default function Card({ title, value, type }) {
 
   return (
     <div className="group rounded-2xl bg-secondary-0 shadow-md transition-all duration-300 hover:shadow-xl hover:scale-[1.03] p-6">
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2 md:gap-4">
         <div
           className={`p-3 rounded-xl ${colors.iconBg} flex items-center justify-center`}
         >
