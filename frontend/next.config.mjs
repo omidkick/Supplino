@@ -1,4 +1,4 @@
-! for deploying :
+// ! for deploying :
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
